@@ -1,0 +1,7 @@
+# 저작권 원본 자료
+01_sources/**/*.pdf
+# manim 중간 산출물
+**/media/videos/**/partial_movie_files/
+**/media/images/
+**/media/texts/
+**/__pycache__/

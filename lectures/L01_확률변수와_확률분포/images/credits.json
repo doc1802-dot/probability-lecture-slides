@@ -1,0 +1,50 @@
+{
+ "dice.jpg": {
+  "artist": "JonRichfield",
+  "license": "CC BY-SA 4.0"
+ },
+ "coin_flip.jpg": {
+  "artist": "ICMA Photos",
+  "license": "CC BY-SA 2.0"
+ },
+ "barcode_scanner.jpg": {
+  "artist": "Network.nt",
+  "license": "Public domain"
+ },
+ "marbles.jpg": {
+  "artist": "Joe Mabel",
+  "license": "CC BY-SA 3.0"
+ },
+ "water.jpg": {
+  "artist": "Hasan Hagi",
+  "license": "CC BY 3.0"
+ },
+ "pizza.jpg": {
+  "artist": "Afshin Darian",
+  "license": "CC BY 2.0"
+ },
+ "basketball.jpg": {
+  "artist": "알 수 없음",
+  "license": "Public domain"
+ },
+ "subway.jpg": {
+  "artist": "阿貴",
+  "license": "CC BY-SA 3.0"
+ },
+ "dartboard.jpg": {
+  "artist": "kallerna",
+  "license": "CC BY-SA 3.0"
+ },
+ "stairs.jpg": {
+  "artist": "Basile Morin",
+  "license": "CC BY-SA 4.0"
+ },
+ "ramp.jpg": {
+  "artist": "Mr.ちゅらさん",
+  "license": "CC BY-SA 4.0"
+ },
+ "resistors.jpg": {
+  "artist": "Evan-Amos",
+  "license": "Public domain"
+ }
+}
