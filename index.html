@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>L02 기댓값과 표준편차</title>
+<style>
+  body { font-family: "Malgun Gothic", sans-serif; background: #F7F6F2; color: #1F2A44; max-width: 900px; margin: 0 auto; padding: 16px; }
+  h1 { font-size: 28px; } h2 { margin-top: 40px; }
+  .card { background: #fff; border: 1px solid #ddd; border-radius: 12px; padding: 16px; margin: 12px 0; }
+  button { font: inherit; padding: 6px 14px; margin: 4px; border-radius: 8px; border: 1px solid #1F2A44; background: #fff; cursor: pointer; }
+  button.ok { background: #2F6DB5; color: #fff; } button.no { background: #E07A2F; color: #fff; }
+  canvas { width: 100%; background: #1F2A44; border-radius: 12px; }
+  .row { display: flex; align-items: center; gap: 8px; } .row input { flex: 1; }
+</style>
+</head>
+<body>
+<h1>L02 기댓값과 표준편차</h1>
+
+<h2>1. 플레이그라운드: 분포를 바꿔 보기</h2>
+<p>막대 높이를 바꾸면 무게중심(E)과 ±σ 범위가 움직임</p>
+<canvas id="cv" width="800" height="360"></canvas>
+<div class="card" id="sliders"></div>
+<button onclick="setP([.2,.4,.3,.1])">배송 예제</button>
+<button onclick="setP([.25,.25,.25,.25])">균등</button>
+<button onclick="setP([0,.5,.5,0])">집중</button>
+<button onclick="setP([.5,0,0,.5])">양 끝</button>
+<button onclick="simulate()">400회 모의실험</button>
+
+<h2>2. 확인 퀴즈</h2>
+<div id="quiz"></div>
+<p id="score"></p>
+
+<script>
+// ---------- 플레이그라운드 ----------
+const cv = document.getElementById('cv'), g = cv.getContext('2d');
+let p = [.2, .4, .3, .1], shown = { m: 2.3, s: 0.9 }, hist = null;
+const X = v => 120 + (v - 1) * 190, Y0 = 300;
+
+function stats(q) {
+  const t = q.reduce((a, b) => a + b, 0) || 1, w = q.map(v => v / t);
+  const m = w.reduce((a, v, i) => a + v * (i + 1), 0);
+  const s = Math.sqrt(w.reduce((a, v, i) => a + v * (i + 1 - m) ** 2, 0));
+  return { w, m, s };
+}
+
+function draw() {
+  const { w, m, s } = stats(p);
+  shown.m += (m - shown.m) * 0.15; shown.s += (s - shown.s) * 0.15;  // 부드럽게 따라감
+  g.fillStyle = '#1F2A44'; g.fillRect(0, 0, 800, 360);
+  g.fillStyle = 'rgba(242,166,90,.25)';
+  g.fillRect(X(shown.m - shown.s), 30, X(shown.m + shown.s) - X(shown.m - shown.s), Y0 - 30);
+  w.forEach((v, i) => {
+    g.fillStyle = '#6FA8E8'; g.fillRect(X(i + 1) - 50, Y0 - v * 400, 100, v * 400);
+    g.fillStyle = '#F7F6F2'; g.font = '18px sans-serif'; g.textAlign = 'center';
+    g.fillText((i + 1) + '일', X(i + 1), Y0 + 26); g.fillText(v.toFixed(2), X(i + 1), Y0 - v * 400 - 8);
+  });
+  if (hist) hist.forEach((c, i) => { g.strokeStyle = '#fff'; g.strokeRect(X(i + 1) - 50, Y0 - c * 400, 100, c * 400); });
+  g.strokeStyle = '#F7F6F2'; g.beginPath(); g.moveTo(40, Y0); g.lineTo(760, Y0); g.stroke();
+  g.fillStyle = '#E07A2F'; g.beginPath();  // 받침점 삼각형
+  g.moveTo(X(shown.m), Y0); g.lineTo(X(shown.m) - 16, Y0 + 30); g.lineTo(X(shown.m) + 16, Y0 + 30); g.fill();
+  g.fillStyle = '#F2A65A'; g.font = 'bold 20px sans-serif'; g.textAlign = 'left';
+  g.fillText(`E(X) = ${m.toFixed(2)}   σ = ${s.toFixed(2)}   V = ${(s * s).toFixed(2)}`, 20, 24);
+  requestAnimationFrame(draw);
+}
+
+function renderSliders() {
+  document.getElementById('sliders').innerHTML = p.map((v, i) =>
+    `<div class="row">${i + 1}일 <input type="range" min="0" max="1" step="0.05" value="${v}"
+      oninput="p[${i}]=+this.value;hist=null"></div>`).join('');
+}
+function setP(q) { p = q.slice(); hist = null; renderSliders(); }
+
+function simulate() {  // 400번 뽑아 상대도수를 흰 테두리로 표시
+  const { w } = stats(p), c = [0, 0, 0, 0];
+  for (let k = 0; k < 400; k++) {
+    let r = Math.random(), i = 0;
+    while (i < 3 && r > w[i]) { r -= w[i]; i++; }
+    c[i]++;
+  }
+  hist = c.map(v => v / 400);
+}
+renderSliders(); draw();
+
+// ---------- 퀴즈 ----------
+const Q = [
+  ['E(X) = 2.3일 때 E(2X + 1)?', ['4.6', '5.6', '2.3'], 1],
+  ['σ(X) = 0.9일 때 σ(X + 10)?', ['0.9', '10.9', '9'], 0],
+  ['σ(X) = 0.9일 때 σ(−3X)?', ['−2.7', '2.7', '0.3'], 1],
+  ['V(X) = 0.81이면 σ(X)?', ['0.81', '0.9', '0.4'], 1],
+];
+let score = 0;
+document.getElementById('quiz').innerHTML = Q.map(([q, opts], i) =>
+  `<div class="card"><b>Q${i + 1}.</b> ${q}<br>` +
+  opts.map((o, j) => `<button onclick="answer(this,${i},${j})">${o}</button>`).join('') + '</div>').join('');
+
+function answer(btn, i, j) {
+  const box = btn.parentElement;
+  if (box.dataset.done) return;
+  box.dataset.done = 1;
+  const ok = j === Q[i][2];
+  btn.className = ok ? 'ok' : 'no';
+  if (!ok) box.querySelectorAll('button')[Q[i][2]].className = 'ok';
+  score += ok;
+  document.getElementById('score').textContent = `점수: ${score} / ${Q.length}`;
+}
+</script>
+</body>
+</html>
